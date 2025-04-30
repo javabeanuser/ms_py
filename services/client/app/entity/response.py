@@ -52,21 +52,23 @@ class JSONResponseBuilder(BaseModel):
         return self
 
     def build(self) -> JSONResponse:
+        json = {
+            "meta": {
+                "tracking_id": self.__default(self.tracking_id),
+                "subscriber_id": self.__default(self.subscriber_id),
+                "message_id": self.__default(self.message_id),
+                "timestamp": str(datetime.datetime.now())
+            },
+            "status": {
+                "status_code": self.__default(self.status_code),
+                "status": self.__default(self.status),
+                "description": self.__default(self.description)
+            }
+        }
+        if self.data:
+            json["data"] = self.__default(self.data)
+
         return JSONResponse(
             status_code=self.status_code,
-            content=
-            {
-                "meta": {
-                    "tracking_id": self.__default(self.tracking_id),
-                    "subscriber_id": self.__default(self.subscriber_id),
-                    "message_id": self.__default(self.message_id),
-                    "timestamp": str(datetime.datetime.now())
-                },
-                "status": {
-                    "status_code": self.__default(self.status_code),
-                    "status": self.__default(self.status),
-                    "description": self.__default(self.description)
-                },
-                "data": self.__default(self.data)
-            }
+            content=json
         )

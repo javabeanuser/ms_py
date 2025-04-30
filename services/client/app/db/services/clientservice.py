@@ -72,12 +72,13 @@ class ClientService(ACRUDService):
         return [JSONClientBuilder().id(db_client.id).name(db_client.name).email(db_client.email).build()]
 
     @database_error_handler
-    async def delete(self, client):
-        rs = await self.db.execute(select(Client).where(Client.id == int(client.id)))
+    async def delete(self, client_id):
+        rs = await self.db.execute(select(Client).where(Client.id == client_id))
         db_client = rs.scalars().first()
         if db_client:
             log.debug(f"Update client.id = : {db_client.id}")
+            db_client.active = False
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client is not found")
-        await self.db.delete(db_client)
         await self.db.commit()
+        await self.db.refresh(db_client)

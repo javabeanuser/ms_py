@@ -22,7 +22,9 @@ router = APIRouter(
 @router.get("/get")
 async def get(id: int = None,
               name: str = None,
-              email: str = None, db: AsyncSession = Depends(get_session)):
+              email: str = None,
+              payload: CDFRequest = None,
+              db: AsyncSession = Depends(get_session)):
     if id is None and name is None and email is None:
         return JSONResponseBuilder() \
             .set_status_code(status.HTTP_404_NOT_FOUND) \
@@ -36,6 +38,9 @@ async def get(id: int = None,
     clients = await ClientService(db).get(client=client)
     log.debug(clients)
     return JSONResponseBuilder() \
+        .set_tracking_id(payload.meta.tracking_id) \
+        .set_subscriber_id(payload.meta.subscriber_id) \
+        .set_message_id(payload.meta.message_id) \
         .set_status_code(status.HTTP_200_OK) \
         .set_status(Status.success) \
         .set_data(clients) \
@@ -64,6 +69,9 @@ async def update(client_id: int, payload: CDFRequest, db: AsyncSession = Depends
     client.id = client_id
     clients = await ClientService(db).update(client)
     return JSONResponseBuilder() \
+        .set_tracking_id(payload.meta.tracking_id) \
+        .set_subscriber_id(payload.meta.subscriber_id) \
+        .set_message_id(payload.meta.message_id) \
         .set_status_code(status.HTTP_200_OK) \
         .set_status(Status.success) \
         .set_data(clients) \
@@ -71,9 +79,12 @@ async def update(client_id: int, payload: CDFRequest, db: AsyncSession = Depends
 
 
 @router.delete("/delete/{client_id}")
-async def delete(client_id: int, db: AsyncSession = Depends(get_session)):
+async def delete(client_id: int, payload: CDFRequest, db: AsyncSession = Depends(get_session)):
     await ClientService(db).delete(client_id)
     return JSONResponseBuilder() \
+        .set_tracking_id(payload.meta.tracking_id) \
+        .set_subscriber_id(payload.meta.subscriber_id) \
+        .set_message_id(payload.meta.message_id) \
         .set_status_code(status.HTTP_200_OK) \
         .set_status(Status.success) \
         .build()

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, List, Union, Text
+from typing import Optional, List, Union, Text, Required
 from pydantic import BaseModel, Field
 
 
@@ -20,23 +20,18 @@ class RStatusEnum(str, Enum):
 
 
 class RMeta(BaseModel):
-    tracking_id: Text = Field(default=None,
-                              title="Tracking ID",
+    tracking_id: Text = Field(title="Tracking ID",
                               description="Unique identifier for tracking the message.")
-    subscriber_id: Text = Field(default=None,
-                                title="Subscriber ID",
+    subscriber_id: Text = Field(title="Subscriber ID",
                                 description="Identifier for the subscribing service or entity.")
-    message_id: Text = Field(default=None,
-                             title="Message ID",
+    message_id: Text = Field(title="Message ID",
                              description="Unique identifier for the message.")
 
 
 class RStatus(BaseModel):
-    status_code: int = Field(default=200,
-                             title="Response status code",
+    status_code: int = Field(title="Response status code",
                              description="The code is equal HTTP response code")
-    status: RStatusEnum = Field(default=None,
-                                title="Response status",
+    status: RStatusEnum = Field(title="Response status",
                                 description="Jus An enumeration entity success | failed")
     description: Text = Field(default=None,
                               title="Response description",
@@ -44,8 +39,8 @@ class RStatus(BaseModel):
 
 
 class CDFRequest(BaseModel):
-    meta: RMeta = Field(default=None, title="Meta", description="Metadata about the message.")
-    data: Optional[Union[List, Client]] = Field(None, description="Payload objects")
+    meta: RMeta = Field(title="Meta", description="Metadata about the message.")
+    data: Optional[Union[Client,List]] = Field(None, description="Payload objects")
 
 
 class CDFResponse(BaseModel):
